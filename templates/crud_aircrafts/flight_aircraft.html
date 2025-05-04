@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Details Flight</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/flight_details.css') }}">
+</head> 
+
+<body>
+    <form method="POST" action="/flight/{{ flight.id }}">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid">
+                <!-- Логотип -->
+                <div class="d-flex align-items-center">
+                    <h1>Детали рейса</h1>
+                    <a href="/" class="navbar-brand">
+                        <img src="{{ url_for('static', filename='images/LOGO.png') }}" alt="Flight Management" width="50">
+                    </a>
+                </div>   
+                <div class="d-flex align-items-center">
+                    <!-- Элемент для отображения курса USD -->
+                    <div id="usd-rate" class="me-3">Курс USD загружается...</div>
+                        <!-- Поля формы -->
+                    <a href="/download_excel/{{ flight.id }}" class="btn btn-primary">Скачать Excel</a>
+                    <a href="/" class="btn btn-primary">Назад</a>
+                </div>
+            </div>
+        </nav>
+        <section class="mb-4">
+            <div class="table-responsive">
+                <!-- Поля для ввода данных -->
+                    <!-- Поля для ввода кто производит расчет и время производимого расчета -->
+                    <div class="section">
+                        <div class="section-title" style="font-size: 1.5rem; font-weight: bold;"></div>
+                            <table class="table table-striped">
+                                <tr>
+                                    <th>Расчет произвел</th>
+                                    <th>Дата расчета</th>
+                                </tr>
+                                <tr>
+                                    <td>{{ calculations.performed_by }}</td>
+                                    <td>{{ flight.calculation_date }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    <!-- Поля для ввода  Дата рейса, Цена летного часа, Тип воздушного судна, Количество топлива в самолете перед первой заправкой, т, Воздушное судно, Маршрут (страны)-->
+                    <div class="section">
+                    <div class="section-title" style="font-size: 1.5rem; font-weight: bold;"></div>
+                        <table class="table table-striped">
+                            <tr>
+                                <th>Дата рейса</th>
+                                <th>Цена летного часа</th>
+                                <th>Тип воздушного судна</th>
+                                <th>Количество топлива в самолете перед первой заправкой, т</th>
+                                <th>Воздушное судно</th>
+                                <th>Маршрут (страны)</th>
+                            </tr>
+                            <tr>
+                                <td>{{ flight.date }}</td>
+                                <td>{{ calculations.price_per_hour_usd }}</td>
+                                <td>
+                                    {% if flight.aircraft_type == "plane" %}
+                                      Самолет
+                                    {% elif flight.aircraft_type == "helicopter" %}
+                                      Вертолет
+                                    {% else %}
+                                      {{ flight.aircraft_type }}
+                                    {% endif %}
+                                </td>
+                                    
+                                <td>{{ calculations.initial_fuel_t }}</td>
+                                <td>{{ flight.aircraft }}</td>
+                                <td>{{ flight.route_countries }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <!-- Основные поля расчета -->
+                    <div class="section">
+                        <div class="section-title" style="font-size: 1.5rem; font-weight: bold;"></div>
+                        <table class="table table-striped">
+                            <tr>
+                                <th>Маршрут</th>
+                                <th>Коммерческая загрузка, т</th>
+                                <th>Расстояни между пунктами, км:</th>
+                                <th>Скорость, км/ч</th>
+                                <th>Время, ч</th>
+                                <th>Часовой расход топлива, т/час</th>
+                                <th>Расход топлива, т</th>
+                                <th>Требуемый навигационный остаток топлива, т</th>
+                                <th>Заправлено топлива, т</th>
+                                <th>Остаток топлива на посадке, т</th>
+                                <th>Взлетный вес, т</th>
+                                <th>Перегрузка на взлете, т</th>
+                                <th>Посадочный вес, т</th>
+                                <th>Перегрузка на посадке, т</th>
+                            </tr>
+                            <tr>
+                                <td>{{ flight.route_airports }}</td>
+                                <td>{{ flight.max_commercial_load }}</td>
+                                <td>{{ calculations.distance_km }}</td>
+                                <td>{{ calculations.speed_kmh }}</td>
+                                <td>{{ calculations.flight_time_h }}</td>
+                                <td>{{ calculations.fuel_consumption_per_hour_t }}</td>
+                                <td>{{ calculations.fuel_consumption_t }}</td>
+                                <td>{{ calculations.required_residual_fuel_t }}</td>
+                                <td>{{ calculations.refueled_fuel_t }}</td>
+                                <td>{{ calculations.landing_fuel_residual_t }}</td>
+                                <td>{{ calculations.takeoff_weight_t }}</td>
+                                <td>{{ calculations.takeoff_overweight_t }}</td>
+                                <td>{{ calculations.landing_weight_t }}</td>
+                                <td>{{ calculations.landing_overweight_t }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <!-- Основные поля расчета -->
+                    <div class="section">
+                        <div class="section-title" style="font-size: 1.5rem; font-weight: bold;"></div>
+                        <table class="table table-striped">
+                            <tr>
+                                <th>Маршрут</th>
+                                <th>Аренда ВС</th>
+                                <th>Цена топлива, $/т</th>
+                                <th>Цена заправки, $</th>
+                                <th>Цена взлет-посадки, $</th>
+                                <th>Цена коммерческого-технического обслуживания, $</th>
+                                <th>Цена стоянки, $</th>
+                                <th>Количество питаний</th>
+                                <th>Цена питания, $</th>
+                                <th>Суточные, $</th>
+                                <th>Обеспечение, $</th>
+                                <th>Трассовые аэронавигационные сборы, $</th>
+                                <th>Проживание, $</th>
+                                <th>Разное, $</th>
+                            </tr>
+                            <tr>
+                                <td>{{ flight.route_airports }}</td>
+                                <td>{{ calculations.aircraft_rent_cost }}</td>
+                                <td>{{ calculations.fuel_price_per_t }}</td>
+                                <td>{{ calculations.fuel_cost }}</td>
+                                <td>{{ calculations.takeoff_landing_cost }}</td>
+                                <td>{{ calculations.maintenance_cost }}</td>
+                                <td>{{ calculations.parking_cost }}</td>
+                                <td>{{ calculations.catering_count }}</td>
+                                <td>{{ calculations.catering_price_per_meal }}</td>
+                                <td>{{ calculations.crew_daily_allowance }}</td>
+                                <td>{{ calculations.support_cost }}</td>
+                                <td>{{ calculations.navigation_fees }}</td>
+                                <td>{{ calculations.accommodation_cost }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <!-- Информация о ВС нужная для расчета -->
+                    <div class="section">
+                        <div class="section-title" style="font-size: 1.5rem; font-weight: bold;">Технические данные</div>
+                        <table class="table table-striped">
+                            <tr>
+                                <th style="font-weight: bold;">Максимальный взлетный вес самолета, т</th>
+                                <th style="font-weight: bold;">Максимальный посадочный вес самолета, т</th>
+                                <th style="font-weight: bold;">Вес пустого снаряженного самолета, т</th>
+                                <th style="font-weight: bold;">Общее количество топлива, т</th>
+                            </tr>
+                            <tr>
+                                <td>{{ calculations.max_takeoff_weight_t }}</td>
+                                <td>{{ calculations.max_landing_weight_t }}</td>
+                                <td>{{ calculations.empty_weight_t }}</td>
+                                <td>{{ calculations.total_fuel_weight_t }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <!-- Информация о экипаже -->
+                    <div class="section">
+                        <div class="section-title" style="font-size: 1.5rem; font-weight: bold;">Данные для расчета</div>
+                        <table class="table table-striped">
+                            <tr>
+                                <th style="font-weight: bold;">Экипаж, чел</th>
+                                <th style="font-weight: bold;">Цена 1 порции питания, $</th> <!-- Нет в БД-->
+                            </tr>
+                            <tr>
+                                <td>{{ calculations.price_per_serving }}</td>
+                                <td>{{ calculations.crew_count }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="section">
+                        <div class="section-title" style="font-size: 1.5rem; font-weight: bold;">Примечания</div>
+                        <textarea class="form-control" rows="5">{{ calculations.note }}</textarea>
+                      </div>
+                                    
+            
+                <!-- Итоговая информация -->
+                <div class="summary-container" id="summaryBox">
+                    <div class="summary-header d-flex justify-content-between align-items-center">
+                      <h4>Итоги</h4>
+                      <button type="button" class="btn btn-sm btn-outline-secondary" id="toggleBtn" onclick="toggleSummary()">Свернуть</button>
+                    </div>
+                    <div class="summary-body">
+                      <div class="summary-item">
+                        <strong>ВСЕГО затрат, $:</strong> {{ calculations.total_cost }}
+                      </div>
+                      <div class="summary-item">
+                        <strong>ЦЕНА рейса объявленная, $:</strong> {{ calculations.declared_flight_price }}
+                      </div>
+                      <div class="summary-item">
+                        <strong>ЦЕНА рейса объявленная, руб. (справочно):</strong> {{ calculations.declared_flight_price_rub }}
+                      </div>
+                    </div>
+                  </div>                  
+            </div>
+    </form>
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="{{ url_for('static', filename='js/flight_details.js') }}"></script> 
+</body>
+</html>
