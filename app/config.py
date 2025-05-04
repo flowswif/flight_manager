@@ -1,5 +1,5 @@
 MYSQL_USER = 'root'
-MYSQL_PASSWORD = 'new_password'
+MYSQL_PASSWORD = 'Sadycova30'
 MYSQL_DB = 'flight_manager'
 MYSQL_HOST = 'localhost'
 SECRET_KEY = 'secretkey'
